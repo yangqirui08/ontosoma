@@ -28,4 +28,7 @@ Thumbs.db
 coverage/
 .nyc_output/
 
+# 生成的本体可视化 HTML 可由 lockfile 重新渲染,不提交
+.ontosoma/*.html
+
 # NOTE: 派生出的本体产物 (.ontosoma/) 是 lockfile,要提交,故不在此忽略。

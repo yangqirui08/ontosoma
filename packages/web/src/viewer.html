@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>OntoSoma · 本体</title>
+<style>
+  :root {
+    --bg:#0f1115; --panel:#171a21; --line:#2a2f3a;
+    --module:#5b9cff; --symbol:#9b8cff; --imports:#5b9cff; --contains:#3a4150;
+    --text:#e6e9ef; --muted:#8a93a6;
+  }
+  * { box-sizing:border-box; }
+  html,body { margin:0; height:100%; background:var(--bg); color:var(--text);
+    font:13px/1.5 ui-sans-serif,system-ui,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif; }
+  #app { display:flex; flex-direction:column; height:100%; }
+  header { display:flex; align-items:center; gap:18px; padding:10px 14px; border-bottom:1px solid var(--line); flex-wrap:wrap; }
+  header h1 { font-size:15px; margin:0; font-weight:600; }
+  header h1 .sub { color:var(--muted); font-weight:400; }
+  .lens { display:flex; align-items:center; gap:6px; }
+  .lens > label { color:var(--muted); }
+  .seg { background:var(--panel); color:var(--text); border:1px solid var(--line); border-radius:6px; padding:4px 9px; cursor:pointer; font:inherit; }
+  .seg.active { border-color:var(--module); color:var(--module); }
+  input[type=search]{ background:var(--panel); border:1px solid var(--line); border-radius:6px; color:var(--text); padding:4px 9px; font:inherit; width:160px; }
+  .legend { display:flex; gap:14px; color:var(--muted); margin-left:auto; }
+  .dot { display:inline-block; width:9px; height:9px; border-radius:50%; vertical-align:middle; margin-right:5px; }
+  main { flex:1; display:flex; min-height:0; }
+  #graph { flex:1; min-width:0; height:100%; cursor:grab; display:block; }
+  #graph:active { cursor:grabbing; }
+  aside { width:320px; border-left:1px solid var(--line); padding:12px 16px; overflow:auto; background:var(--panel); }
+  aside h2 { font-size:14px; margin:0 0 2px; word-break:break-all; }
+  aside h3 { font-size:11px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); margin:14px 0 4px; }
+  aside .kind { color:var(--muted); font-size:12px; word-break:break-all; }
+  aside ul { margin:4px 0; padding-left:16px; }
+  aside li { color:var(--text); word-break:break-all; }
+  aside .empty { color:var(--muted); }
+  code { font-family:ui-monospace,"Cascadia Code",Consolas,monospace; }
+  svg text { fill:var(--text); font-size:10px; pointer-events:none; user-select:none; }
+  footer { padding:5px 14px; color:var(--muted); border-top:1px solid var(--line); font-size:11px; }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1>OntoSoma <span class="sub">· 本体</span></h1>
+    <div class="lens">
+      <label>高度</label>
+      <button class="seg" data-alt="module">模块</button>
+      <button class="seg active" data-alt="all">模块+符号</button>
+    </div>
+    <div class="lens">
+      <label>关系</label>
+      <button class="seg active" data-edge="imports">imports</button>
+      <button class="seg active" data-edge="contains">contains</button>
+    </div>
+    <div class="lens">
+      <input type="search" id="search" placeholder="搜节点…" />
+    </div>
+    <div class="legend">
+      <span><span class="dot" style="background:var(--module)"></span>module</span>
+      <span><span class="dot" style="background:var(--symbol)"></span>symbol</span>
+    </div>
+  </header>
+  <main>
+    <svg id="graph"></svg>
+    <aside id="panel"><div class="empty">点一个节点，看它的关系。背景拖动平移，滚轮缩放。</div></aside>
+  </main>
+  <footer id="status"></footer>
+</div>
+
+<script>const DATA = "__ONTOSOMA_DATA__";</script>
+<script>
+(function () {
+  const data = (DATA && typeof DATA === 'object') ? DATA : { nodes: [], edges: [] };
+  const allNodes = data.nodes || [];
+  const allEdges = data.edges || [];
+  const byId = new Map(allNodes.map((n) => [n.id, n]));
+  const NS = 'http://www.w3.org/2000/svg';
+
+  const svg = document.getElementById('graph');
+  const panel = document.getElementById('panel');
+  const statusEl = document.getElementById('status');
+
+  const state = { altitude: 'all', edges: { imports: true, contains: true }, search: '', focus: null };
+  const pos = new Map();           // id -> {x,y,vx,vy}
+  let current = { nodes: [], edges: [] };
+  let tx = 0, ty = 0, scale = 1;
+
+  function esc(s) {
+    return String(s).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+  }
+
+  function neighborsOf(id) {
+    const ins = [], outs = [], contains = [], containedBy = [];
+    for (const e of allEdges) {
+      if (e.kind === 'imports') { if (e.from === id) outs.push(e.to); if (e.to === id) ins.push(e.from); }
+      if (e.kind === 'contains') { if (e.from === id) contains.push(e.to); if (e.to === id) containedBy.push(e.from); }
+    }
+    return { ins, outs, contains, containedBy };
+  }
+
+  function visible() {
+    const wantSym = state.altitude === 'all';
+    let nodes = allNodes.filter((n) => wantSym || n.kind === 'module');
+    if (state.search) {
+      const q = state.search.toLowerCase();
+      const match = new Set(nodes.filter((n) =>
+        n.name.toLowerCase().includes(q) || n.id.toLowerCase().includes(q)).map((n) => n.id));
+      const keep = new Set(match);
+      for (const e of allEdges) { if (match.has(e.from)) keep.add(e.to); if (match.has(e.to)) keep.add(e.from); }
+      nodes = nodes.filter((n) => keep.has(n.id));
+    }
+    const ids = new Set(nodes.map((n) => n.id));
+    const edges = allEdges.filter((e) => state.edges[e.kind] && ids.has(e.from) && ids.has(e.to));
+    return { nodes, edges };
+  }
+
+  function layout(nodes, edges) {
+    const W = svg.clientWidth || 900, H = svg.clientHeight || 600;
+    for (const n of nodes) {
+      if (!pos.has(n.id)) pos.set(n.id, { x: W / 2 + (Math.random() - 0.5) * 240, y: H / 2 + (Math.random() - 0.5) * 240, vx: 0, vy: 0 });
+    }
+    const arr = nodes.map((n) => pos.get(n.id));
+    const REP = 5200, SPRING = 0.04, LEN = 95, DAMP = 0.85, CENTER = 0.008;
+    for (let it = 0; it < 320; it++) {
+      for (let i = 0; i < arr.length; i++) {
+        for (let j = i + 1; j < arr.length; j++) {
+          let dx = arr[i].x - arr[j].x, dy = arr[i].y - arr[j].y;
+          const d2 = dx * dx + dy * dy + 0.01, d = Math.sqrt(d2), f = REP / d2;
+          const fx = (f * dx) / d, fy = (f * dy) / d;
+          arr[i].vx += fx; arr[i].vy += fy; arr[j].vx -= fx; arr[j].vy -= fy;
+        }
+      }
+      for (const e of edges) {
+        const a = pos.get(e.from), b = pos.get(e.to); if (!a || !b) continue;
+        const dx = b.x - a.x, dy = b.y - a.y, d = Math.sqrt(dx * dx + dy * dy) + 0.01;
+        const f = SPRING * (d - LEN), fx = (f * dx) / d, fy = (f * dy) / d;
+        a.vx += fx; a.vy += fy; b.vx -= fx; b.vy -= fy;
+      }
+      for (const p of arr) {
+        p.vx += (W / 2 - p.x) * CENTER; p.vy += (H / 2 - p.y) * CENTER;
+        p.vx *= DAMP; p.vy *= DAMP; p.x += p.vx; p.y += p.vy;
+      }
+    }
+  }
+
+  function applyTransform() {
+    const g = svg.querySelector('g.viewport');
+    if (g) g.setAttribute('transform', `translate(${tx},${ty}) scale(${scale})`);
+  }
+
+  function draw() {
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+
+    const defs = document.createElementNS(NS, 'defs');
+    const marker = document.createElementNS(NS, 'marker');
+    marker.setAttribute('id', 'arrow'); marker.setAttribute('viewBox', '0 0 10 10');
+    marker.setAttribute('refX', '13'); marker.setAttribute('refY', '5');
+    marker.setAttribute('markerWidth', '6'); marker.setAttribute('markerHeight', '6');
+    marker.setAttribute('orient', 'auto-start-reverse');
+    const mp = document.createElementNS(NS, 'path');
+    mp.setAttribute('d', 'M0,0 L10,5 L0,10 z'); mp.setAttribute('fill', '#5b9cff');
+    marker.appendChild(mp); defs.appendChild(marker); svg.appendChild(defs);
+
+    const g = document.createElementNS(NS, 'g');
+    g.setAttribute('class', 'viewport');
+    g.setAttribute('transform', `translate(${tx},${ty}) scale(${scale})`);
+    svg.appendChild(g);
+
+    const focus = state.focus;
+    const fset = focus ? new Set([focus, ...Object.values(neighborsOf(focus)).flat()]) : null;
+    const dim = (id) => (fset ? !fset.has(id) : false);
+
+    for (const e of current.edges) {
+      const a = pos.get(e.from), b = pos.get(e.to); if (!a || !b) continue;
+      const ln = document.createElementNS(NS, 'line');
+      ln.setAttribute('x1', a.x); ln.setAttribute('y1', a.y);
+      ln.setAttribute('x2', b.x); ln.setAttribute('y2', b.y);
+      ln.setAttribute('stroke', e.kind === 'imports' ? 'var(--imports)' : 'var(--contains)');
+      ln.setAttribute('stroke-width', e.kind === 'imports' ? 1.3 : 1);
+      if (e.kind === 'imports') ln.setAttribute('marker-end', 'url(#arrow)');
+      if (fset && (dim(e.from) || dim(e.to))) ln.setAttribute('opacity', '0.08');
+      g.appendChild(ln);
+    }
+
+    for (const n of current.nodes) {
+      const p = pos.get(n.id); if (!p) continue;
+      const grp = document.createElementNS(NS, 'g');
+      grp.setAttribute('transform', `translate(${p.x},${p.y})`);
+      if (dim(n.id)) grp.setAttribute('opacity', '0.12');
+      const r = n.kind === 'module' ? 8 : 5;
+      const c = document.createElementNS(NS, 'circle');
+      c.setAttribute('r', r);
+      c.setAttribute('fill', n.kind === 'module' ? 'var(--module)' : 'var(--symbol)');
+      c.setAttribute('stroke', n.id === focus ? '#fff' : 'rgba(0,0,0,0.5)');
+      c.setAttribute('stroke-width', n.id === focus ? 2 : 1);
+      c.style.cursor = 'pointer';
+      grp.appendChild(c);
+      const t = document.createElementNS(NS, 'text');
+      t.setAttribute('x', r + 3); t.setAttribute('y', 3.5);
+      t.textContent = n.name.length > 30 ? `${n.name.slice(0, 29)}…` : n.name;
+      grp.appendChild(t);
+      grp.addEventListener('mousedown', (ev) => ev.stopPropagation());
+      grp.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        state.focus = state.focus === n.id ? null : n.id;
+        showPanel(state.focus); draw();
+      });
+      g.appendChild(grp);
+    }
+
+    statusEl.textContent =
+      `${current.nodes.length} 节点 · ${current.edges.length} 边`
+      + (focus ? ` · 聚焦：${focus}` : '')
+      + ` · schema v${data.schemaVersion ?? '?'}`;
+  }
+
+  function showPanel(id) {
+    const n = id && byId.get(id);
+    if (!n) { panel.innerHTML = '<div class="empty">点一个节点，看它的关系。背景拖动平移，滚轮缩放。</div>'; return; }
+    const nb = neighborsOf(id);
+    const list = (arr) => (arr.length
+      ? `<ul>${arr.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>`
+      : '<div class="empty">—</div>');
+    panel.innerHTML =
+      `<h2>${esc(n.name)}</h2>`
+      + `<div class="kind">${esc(n.kind)}${n.symbolKind ? ` · ${esc(n.symbolKind)}` : ''}<br><code>${esc(n.id)}</code></div>`
+      + `<h3>imports →</h3>${list(nb.outs)}`
+      + `<h3>← imported by</h3>${list(nb.ins)}`
+      + (n.kind === 'module' ? `<h3>contains</h3>${list(nb.contains)}` : `<h3>contained by</h3>${list(nb.containedBy)}`);
+  }
+
+  function recompute() { current = visible(); layout(current.nodes, current.edges); draw(); }
+
+  // pan + zoom (background)
+  let pan = null;
+  svg.addEventListener('mousedown', (e) => { pan = { x: e.clientX - tx, y: e.clientY - ty }; });
+  window.addEventListener('mousemove', (e) => { if (pan) { tx = e.clientX - pan.x; ty = e.clientY - pan.y; applyTransform(); } });
+  window.addEventListener('mouseup', () => { pan = null; });
+  svg.addEventListener('click', (e) => { if (e.target === svg) { state.focus = null; showPanel(null); draw(); } });
+  svg.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const f = e.deltaY < 0 ? 1.1 : 0.9;
+    const r = svg.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top;
+    tx = mx - (mx - tx) * f; ty = my - (my - ty) * f; scale *= f; applyTransform();
+  }, { passive: false });
+  window.addEventListener('resize', draw);
+
+  // lens controls
+  document.querySelectorAll('[data-alt]').forEach((b) => b.addEventListener('click', () => {
+    state.altitude = b.dataset.alt;
+    document.querySelectorAll('[data-alt]').forEach((x) => x.classList.toggle('active', x.dataset.alt === state.altitude));
+    recompute();
+  }));
+  document.querySelectorAll('[data-edge]').forEach((b) => b.addEventListener('click', () => {
+    const k = b.dataset.edge; state.edges[k] = !state.edges[k];
+    b.classList.toggle('active', state.edges[k]); recompute();
+  }));
+  document.getElementById('search').addEventListener('input', (e) => { state.search = e.target.value.trim(); recompute(); });
+
+  recompute();
+})();
+</script>
+</body>
+</html>

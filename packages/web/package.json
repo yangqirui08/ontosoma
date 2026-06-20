@@ -1,0 +1,17 @@
+{
+  "name": "@ontosoma/web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "OntoSoma viewer: render the ontology lockfile into a self-contained, zero-dependency interactive HTML (lenses over modules/symbols, imports/contains).",
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  }
+}
