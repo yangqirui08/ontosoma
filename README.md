@@ -38,7 +38,7 @@ OntoSoma 在分发与跨工具适配上**借鉴** superpowers/openspec 的成熟
 
 ## 仓库形态(规划)
 
-独立 monorepo。OntoSoma 是工具本体,**不寄生在任何使用它的项目里**;它把别的代码库当作分析目标(第一个狗粮目标是隔壁的 A-CDM)。
+独立 monorepo。OntoSoma 是工具本体,**不寄生在任何使用它的项目里**;它把别的代码库当作分析目标(第一个狗粮目标是隔壁的 A-CDM)。A-CDM 里那套 CaaO 是半成品原型,**OntoSoma 是完整正式实现,做好后取代它**。
 
 ```
 ontosoma/
