@@ -33,6 +33,7 @@
   aside h2 { font-size:14px; margin:0 0 4px; word-break:break-all; }
   aside h3 { font-size:11px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); margin:14px 0 4px; }
   aside .kind { color:var(--muted); font-size:12px; word-break:break-all; }
+  aside .note { color:var(--text); font-size:12.5px; margin-top:8px; padding:8px 10px; background:#0f1115; border:1px solid var(--line); border-radius:6px; }
   aside ul { margin:4px 0; padding-left:16px; }
   aside li { color:var(--text); word-break:break-all; }
   aside ul.hint li, aside .empty { color:var(--muted); }
@@ -227,12 +228,17 @@
       c.style.cursor = 'pointer';
       grp.appendChild(c);
 
+      // 中文名(对人友好)上墙;代码真名(对AI准确)作为 hover 提示与详情里的锚
+      const label = n.cn || n.name;
+      const titleEl = document.createElementNS(NS, 'title');
+      titleEl.textContent = n.id;
+      grp.appendChild(titleEl);
       // 低心智负担:模块名常显;符号名仅在聚焦/悬停/小图时显
       const showLabel = n.kind === 'module' || smallGraph || (aset && aset.has(n.id)) || hoverId === n.id;
       if (showLabel) {
         const t = document.createElementNS(NS, 'text');
         t.setAttribute('x', r + 3); t.setAttribute('y', 3.5);
-        t.textContent = n.name.length > 30 ? `${n.name.slice(0, 29)}…` : n.name;
+        t.textContent = label.length > 30 ? `${label.slice(0, 29)}…` : label;
         grp.appendChild(t);
       }
 
@@ -249,7 +255,7 @@
 
     statusEl.textContent =
       `${current.nodes.length} 节点 · ${current.edges.length} 边`
-      + (state.focus ? ` · 聚焦：${state.focus}` : '')
+      + (state.focus ? ` · 聚焦：${(byId.get(state.focus) || {}).cn || state.focus}` : '')
       + ` · schema v${data.schemaVersion ?? '?'}`;
   }
 
@@ -258,12 +264,14 @@
     const n = id && byId.get(id);
     if (!n) { renderOverview(); return; }
     const nb = neighborsOf(id);
+    const disp = (x) => { const nn = byId.get(x); return esc(nn && nn.cn ? nn.cn : (nn ? nn.name : x)); };
     const list = (arr) => (arr.length
-      ? `<ul>${arr.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>`
+      ? `<ul>${arr.map((x) => `<li>${disp(x)}</li>`).join('')}</ul>`
       : '<div class="empty">—</div>');
     panel.innerHTML =
-      `<h2>${esc(n.name)}</h2>`
+      `<h2>${esc(n.cn || n.name)}</h2>`
       + `<div class="kind">${cn(KIND_LABEL, n.kind)}${n.symbolKind ? ` · ${cn(SYMBOL_LABEL, n.symbolKind)}` : ''}<br><code>${esc(n.id)}</code></div>`
+      + (n.note ? `<div class="note">${esc(n.note)}</div>` : '')
       + `<h3>引用 →</h3>${list(nb.outs)}`
       + `<h3>← 被引用</h3>${list(nb.ins)}`
       + (n.kind === 'module' ? `<h3>包含</h3>${list(nb.contains)}` : `<h3>被包含于</h3>${list(nb.containedBy)}`);

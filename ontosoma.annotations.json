@@ -1,0 +1,26 @@
+{
+  "schemaVersion": "0",
+  "_note": "本体展示的中文标注层(对人友好)。与派生 lockfile(对AI准确)分离:这里写中文名+一句话人话,渲染时叠加;代码标识符仍是唯一锚。key = 本体节点 id。",
+  "objects": {
+    "schema.ts": { "name": "本体结构定义", "note": "最小本体的类型(节点/边/范畴)——代码唯一真源的形状" },
+    "derive.ts": { "name": "派生器", "note": "用 TS 编译器把一个目录的代码看穿,抽成本体" },
+    "lockfile.ts": { "name": "锁文件", "note": "把本体写成确定性、可 diff 的 lockfile,并能读回" },
+    "gate.ts": { "name": "规则闸", "note": "重新派生与已提交 lockfile 比对,漂移即显形" },
+    "cli.ts": { "name": "命令行入口", "note": "derive(派生)/ check(跑闸)两个命令" },
+    "index.ts": { "name": "对外导出", "note": "引擎包的公开出口" },
+
+    "schema.ts#Ontology": { "name": "本体", "note": "节点 + 边的整体" },
+    "schema.ts#OntoNode": { "name": "本体节点", "note": "一个模块或一个符号" },
+    "schema.ts#OntoEdge": { "name": "本体关系", "note": "节点之间的一条有向边" },
+    "schema.ts#NodeKind": { "name": "节点范畴", "note": "module 模块 / symbol 符号" },
+    "schema.ts#SymbolKind": { "name": "符号种类", "note": "类 / 函数 / 常量 / 接口 / 类型 / 枚举" },
+    "schema.ts#EdgeKind": { "name": "关系范畴", "note": "contains 包含 / imports 引用" },
+    "schema.ts#SCHEMA_VERSION": { "name": "本体版本号", "note": "lockfile 的 schema 版本" },
+
+    "derive.ts#deriveOntology": { "name": "派生本体", "note": "扫一个目录的 TS,产出本体" },
+    "lockfile.ts#serializeOntology": { "name": "序列化本体", "note": "稳定排序 + JSON,确定性可 diff" },
+    "lockfile.ts#parseOntology": { "name": "解析本体", "note": "从 lockfile 文本还原本体" },
+    "gate.ts#checkOntology": { "name": "跑闸检查", "note": "对比代码与 lockfile,返回是否一致 + 增删" },
+    "gate.ts#GateResult": { "name": "闸检查结果", "note": "是否一致,以及增/删的节点与边" }
+  }
+}
