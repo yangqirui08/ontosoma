@@ -3,6 +3,12 @@
   "version": "0.1.0",
   "description": "OntoSoma — the living body of your system, always equal to the code. An ontology toolkit for AI-driven development, ops, and iteration: derive a single source-of-truth model from code, keep design / code / runtime in zero-drift, and view it through composable lenses over a timeline.",
   "type": "module",
+  "scripts": {
+    "typecheck": "tsc -p packages/engine/tsconfig.json",
+    "test": "npm test -w @ontosoma/engine",
+    "onto:derive": "tsx packages/engine/src/cli.ts derive packages/engine/src --out .ontosoma/ontology.json",
+    "onto:check": "tsx packages/engine/src/cli.ts check packages/engine/src --out .ontosoma/ontology.json"
+  },
   "license": "MIT",
   "author": "Qirui",
   "homepage": "https://github.com/yangqirui08/ontosoma#readme",
@@ -34,6 +40,9 @@
   "engines": {
     "node": ">=20"
   },
+  "workspaces": [
+    "packages/*"
+  ],
   "publishConfig": {
     "access": "public"
   }

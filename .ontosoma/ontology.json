@@ -1,0 +1,227 @@
+{
+  "schemaVersion": "0",
+  "nodes": [
+    {
+      "id": "cli.ts",
+      "kind": "module",
+      "name": "cli.ts",
+      "path": "cli.ts"
+    },
+    {
+      "id": "derive.ts",
+      "kind": "module",
+      "name": "derive.ts",
+      "path": "derive.ts"
+    },
+    {
+      "id": "derive.ts#deriveOntology",
+      "kind": "symbol",
+      "name": "deriveOntology",
+      "path": "derive.ts",
+      "symbolKind": "function"
+    },
+    {
+      "id": "gate.ts",
+      "kind": "module",
+      "name": "gate.ts",
+      "path": "gate.ts"
+    },
+    {
+      "id": "gate.ts#GateResult",
+      "kind": "symbol",
+      "name": "GateResult",
+      "path": "gate.ts",
+      "symbolKind": "interface"
+    },
+    {
+      "id": "gate.ts#checkOntology",
+      "kind": "symbol",
+      "name": "checkOntology",
+      "path": "gate.ts",
+      "symbolKind": "function"
+    },
+    {
+      "id": "index.ts",
+      "kind": "module",
+      "name": "index.ts",
+      "path": "index.ts"
+    },
+    {
+      "id": "lockfile.ts",
+      "kind": "module",
+      "name": "lockfile.ts",
+      "path": "lockfile.ts"
+    },
+    {
+      "id": "lockfile.ts#parseOntology",
+      "kind": "symbol",
+      "name": "parseOntology",
+      "path": "lockfile.ts",
+      "symbolKind": "function"
+    },
+    {
+      "id": "lockfile.ts#serializeOntology",
+      "kind": "symbol",
+      "name": "serializeOntology",
+      "path": "lockfile.ts",
+      "symbolKind": "function"
+    },
+    {
+      "id": "schema.ts",
+      "kind": "module",
+      "name": "schema.ts",
+      "path": "schema.ts"
+    },
+    {
+      "id": "schema.ts#EdgeKind",
+      "kind": "symbol",
+      "name": "EdgeKind",
+      "path": "schema.ts",
+      "symbolKind": "type"
+    },
+    {
+      "id": "schema.ts#NodeKind",
+      "kind": "symbol",
+      "name": "NodeKind",
+      "path": "schema.ts",
+      "symbolKind": "type"
+    },
+    {
+      "id": "schema.ts#OntoEdge",
+      "kind": "symbol",
+      "name": "OntoEdge",
+      "path": "schema.ts",
+      "symbolKind": "interface"
+    },
+    {
+      "id": "schema.ts#OntoNode",
+      "kind": "symbol",
+      "name": "OntoNode",
+      "path": "schema.ts",
+      "symbolKind": "interface"
+    },
+    {
+      "id": "schema.ts#Ontology",
+      "kind": "symbol",
+      "name": "Ontology",
+      "path": "schema.ts",
+      "symbolKind": "interface"
+    },
+    {
+      "id": "schema.ts#SCHEMA_VERSION",
+      "kind": "symbol",
+      "name": "SCHEMA_VERSION",
+      "path": "schema.ts",
+      "symbolKind": "const"
+    },
+    {
+      "id": "schema.ts#SymbolKind",
+      "kind": "symbol",
+      "name": "SymbolKind",
+      "path": "schema.ts",
+      "symbolKind": "type"
+    }
+  ],
+  "edges": [
+    {
+      "kind": "contains",
+      "from": "derive.ts",
+      "to": "derive.ts#deriveOntology"
+    },
+    {
+      "kind": "contains",
+      "from": "gate.ts",
+      "to": "gate.ts#GateResult"
+    },
+    {
+      "kind": "contains",
+      "from": "gate.ts",
+      "to": "gate.ts#checkOntology"
+    },
+    {
+      "kind": "contains",
+      "from": "lockfile.ts",
+      "to": "lockfile.ts#parseOntology"
+    },
+    {
+      "kind": "contains",
+      "from": "lockfile.ts",
+      "to": "lockfile.ts#serializeOntology"
+    },
+    {
+      "kind": "contains",
+      "from": "schema.ts",
+      "to": "schema.ts#EdgeKind"
+    },
+    {
+      "kind": "contains",
+      "from": "schema.ts",
+      "to": "schema.ts#NodeKind"
+    },
+    {
+      "kind": "contains",
+      "from": "schema.ts",
+      "to": "schema.ts#OntoEdge"
+    },
+    {
+      "kind": "contains",
+      "from": "schema.ts",
+      "to": "schema.ts#OntoNode"
+    },
+    {
+      "kind": "contains",
+      "from": "schema.ts",
+      "to": "schema.ts#Ontology"
+    },
+    {
+      "kind": "contains",
+      "from": "schema.ts",
+      "to": "schema.ts#SCHEMA_VERSION"
+    },
+    {
+      "kind": "contains",
+      "from": "schema.ts",
+      "to": "schema.ts#SymbolKind"
+    },
+    {
+      "kind": "imports",
+      "from": "cli.ts",
+      "to": "derive.ts"
+    },
+    {
+      "kind": "imports",
+      "from": "cli.ts",
+      "to": "gate.ts"
+    },
+    {
+      "kind": "imports",
+      "from": "cli.ts",
+      "to": "lockfile.ts"
+    },
+    {
+      "kind": "imports",
+      "from": "derive.ts",
+      "to": "schema.ts"
+    },
+    {
+      "kind": "imports",
+      "from": "gate.ts",
+      "to": "derive.ts"
+    },
+    {
+      "kind": "imports",
+      "from": "gate.ts",
+      "to": "lockfile.ts"
+    },
+    {
+      "kind": "imports",
+      "from": "gate.ts",
+      "to": "schema.ts"
+    },
+    {
+      "kind": "imports",
+      "from": "lockfile.ts",
+      "to": "schema.ts"
+    }
+  ]
+}
