@@ -17,6 +17,7 @@
   header { display:flex; align-items:center; gap:18px; padding:10px 14px; border-bottom:1px solid var(--line); flex-wrap:wrap; }
   header h1 { font-size:15px; margin:0; font-weight:600; }
   header h1 .sub { color:var(--muted); font-weight:400; }
+  header h1 .seal { color:#cc4b37; font-weight:600; }
   .lens { display:flex; align-items:center; gap:6px; }
   .lens > label { color:var(--muted); }
   .seg { background:var(--panel); color:var(--text); border:1px solid var(--line); border-radius:6px; padding:4px 9px; cursor:pointer; font:inherit; }
@@ -42,7 +43,7 @@
 <body>
 <div id="app">
   <header>
-    <h1>OntoSoma <span class="sub">· 本体</span></h1>
+    <h1>OntoSoma <span class="sub">·</span> <span class="seal">本体</span></h1>
     <div class="lens">
       <label>高度</label>
       <button class="seg" data-alt="module">模块</button>
@@ -50,15 +51,15 @@
     </div>
     <div class="lens">
       <label>关系</label>
-      <button class="seg active" data-edge="imports">imports</button>
-      <button class="seg active" data-edge="contains">contains</button>
+      <button class="seg active" data-edge="imports">引用</button>
+      <button class="seg active" data-edge="contains">包含</button>
     </div>
     <div class="lens">
       <input type="search" id="search" placeholder="搜节点…" />
     </div>
     <div class="legend">
-      <span><span class="dot" style="background:var(--module)"></span>module</span>
-      <span><span class="dot" style="background:var(--symbol)"></span>symbol</span>
+      <span><span class="dot" style="background:var(--module)"></span>模块</span>
+      <span><span class="dot" style="background:var(--symbol)"></span>符号</span>
     </div>
   </header>
   <main>
@@ -76,6 +77,10 @@
   const allEdges = data.edges || [];
   const byId = new Map(allNodes.map((n) => [n.id, n]));
   const NS = 'http://www.w3.org/2000/svg';
+  // 中文优先展示:展示名中文,机读 key / 源码标识符保持英文(代码真源)
+  const KIND_LABEL = { module: '模块', symbol: '符号' };
+  const SYMBOL_LABEL = { class: '类', function: '函数', const: '常量', interface: '接口', type: '类型', enum: '枚举' };
+  const cn = (map, k) => map[k] || k;
 
   const svg = document.getElementById('graph');
   const panel = document.getElementById('panel');
@@ -224,10 +229,10 @@
       : '<div class="empty">—</div>');
     panel.innerHTML =
       `<h2>${esc(n.name)}</h2>`
-      + `<div class="kind">${esc(n.kind)}${n.symbolKind ? ` · ${esc(n.symbolKind)}` : ''}<br><code>${esc(n.id)}</code></div>`
-      + `<h3>imports →</h3>${list(nb.outs)}`
-      + `<h3>← imported by</h3>${list(nb.ins)}`
-      + (n.kind === 'module' ? `<h3>contains</h3>${list(nb.contains)}` : `<h3>contained by</h3>${list(nb.containedBy)}`);
+      + `<div class="kind">${cn(KIND_LABEL, n.kind)}${n.symbolKind ? ` · ${cn(SYMBOL_LABEL, n.symbolKind)}` : ''}<br><code>${esc(n.id)}</code></div>`
+      + `<h3>引用 →</h3>${list(nb.outs)}`
+      + `<h3>← 被引用</h3>${list(nb.ins)}`
+      + (n.kind === 'module' ? `<h3>包含</h3>${list(nb.contains)}` : `<h3>被包含于</h3>${list(nb.containedBy)}`);
   }
 
   function recompute() { current = visible(); layout(current.nodes, current.edges); draw(); }
