@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If you use OntoSoma, please cite it using the metadata below."
+title: "OntoSoma"
+abstract: >-
+  OntoSoma (onto- "being/ontology" + Greek sōma "body"): an ontology toolkit
+  for AI-driven software development, ops, and iteration. It derives a single
+  source-of-truth model from code and keeps design, code, and runtime in
+  zero-drift, navigable through composable lenses over a timeline.
+type: software
+authors:
+  - name: "Qirui"
+repository-code: "https://github.com/ontosoma/ontosoma"
+url: "https://github.com/ontosoma/ontosoma"
+license: MIT
+version: 0.1.0
+date-released: "2026-06-20"
+keywords:
+  - ai-agents
+  - developer-tools
+  - code-intelligence
+  - ontology
+  - zero-drift

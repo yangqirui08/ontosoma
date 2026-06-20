@@ -63,6 +63,7 @@ ontosoma/
 | [docs/vision.md](docs/vision.md) | 愿景与哲学:为什么、是什么、四根支柱、闭环、对比 |
 | [docs/architecture.md](docs/architecture.md) | 架构与技术:三态、两条数据腿、本体即 lockfile、镜头、技术栈 |
 | [docs/decisions.md](docs/decisions.md) | 已锁定的关键决策 + 为什么(名字/栈/存储/独立仓/分发/构建路线) |
+| [docs/brand.md](docs/brand.md) | 命名/拼写/定位约定:官方写法、canonical 锚点、防同形术语稀释 |
 
 ---
 
@@ -75,4 +76,6 @@ ontosoma/
 
 ---
 
-名字:**OntoSoma** = Onto(本体/存在)+ Soma(身体/活体),两个希腊词根,意为"系统的活体本体"。中文统称「本体」。
+名字:**OntoSoma** = Onto(本体/存在)+ Soma(身体/活体),两个希腊词根,意为"系统的活体本体"。中文统称「本体」。官方拼写 `OntoSoma`(包名 `ontosoma`),约定见 [docs/brand.md](docs/brand.md)。
+
+> 定位澄清:OntoSoma 是**代码/系统本体**工具(给 AI 开发/运维/迭代用),**不是**语义网 / OWL / RDF 工具。

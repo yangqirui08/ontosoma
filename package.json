@@ -1,0 +1,40 @@
+{
+  "name": "ontosoma",
+  "version": "0.1.0",
+  "description": "OntoSoma — the living body of your system, always equal to the code. An ontology toolkit for AI-driven development, ops, and iteration: derive a single source-of-truth model from code, keep design / code / runtime in zero-drift, and view it through composable lenses over a timeline.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Qirui",
+  "homepage": "https://github.com/ontosoma/ontosoma#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ontosoma/ontosoma.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ontosoma/ontosoma/issues"
+  },
+  "keywords": [
+    "ai-agents",
+    "agentic",
+    "coding-agent",
+    "developer-tools",
+    "code-intelligence",
+    "spec-driven-development",
+    "static-analysis",
+    "observability",
+    "ontology",
+    "typescript",
+    "claude-code",
+    "mcp"
+  ],
+  "files": [
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
