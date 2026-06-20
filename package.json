@@ -5,13 +5,13 @@
   "type": "module",
   "license": "MIT",
   "author": "Qirui",
-  "homepage": "https://github.com/ontosoma/ontosoma#readme",
+  "homepage": "https://github.com/yangqirui08/ontosoma#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ontosoma/ontosoma.git"
+    "url": "git+https://github.com/yangqirui08/ontosoma.git"
   },
   "bugs": {
-    "url": "https://github.com/ontosoma/ontosoma/issues"
+    "url": "https://github.com/yangqirui08/ontosoma/issues"
   },
   "keywords": [
     "ai-agents",

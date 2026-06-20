@@ -9,8 +9,8 @@ abstract: >-
 type: software
 authors:
   - name: "Qirui"
-repository-code: "https://github.com/ontosoma/ontosoma"
-url: "https://github.com/ontosoma/ontosoma"
+repository-code: "https://github.com/yangqirui08/ontosoma"
+url: "https://github.com/yangqirui08/ontosoma"
 license: MIT
 version: 0.1.0
 date-released: "2026-06-20"

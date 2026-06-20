@@ -35,6 +35,6 @@
 
 ## canonical 锚点(防冒名,谁是"正版"一眼可判)
 
-- **官方仓库**:`https://github.com/ontosoma/ontosoma`(待建)
+- **官方仓库**:`https://github.com/yangqirui08/ontosoma`(已建;将来可转移到 `ontosoma` 组织,GitHub 自动留跳转)
 - **npm**:`https://www.npmjs.com/package/ontosoma`(名字已确认空缺,待占)
 - 对外文案统一指向以上两个 canonical 位置。
